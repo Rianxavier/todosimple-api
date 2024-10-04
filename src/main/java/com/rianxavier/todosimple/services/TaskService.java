@@ -3,6 +3,8 @@ package com.rianxavier.todosimple.services;
 import com.rianxavier.todosimple.models.Task;
 import com.rianxavier.todosimple.models.User;
 import com.rianxavier.todosimple.repositories.TaskRepository;
+import com.rianxavier.todosimple.services.exceptions.DataBindingViolationException;
+import com.rianxavier.todosimple.services.exceptions.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +24,7 @@ public class TaskService {
     public Task findById(Long id) {
         Optional<Task> task = this.taskRepository.findById(id);
 
-        return task.orElseThrow(() -> new RuntimeException(
+        return task.orElseThrow(() -> new ObjectNotFoundException(
                 "Tarefa não encontrada! Id: " + id + ", Tipo: " + Task.class.getName()
         ));
     }
@@ -54,7 +56,7 @@ public class TaskService {
         try {
             this.taskRepository.delete(task);
         } catch (Exception e) {
-            throw new RuntimeException("Não foi possivel deletar a tarefa");
+            throw new DataBindingViolationException("Não foi possivel deletar a tarefa");
         }
     }
 }
