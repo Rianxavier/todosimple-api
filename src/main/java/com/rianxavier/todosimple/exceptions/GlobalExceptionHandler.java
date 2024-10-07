@@ -25,7 +25,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @Value("${server.error.include-exceprion}")
     private boolean printStackTrace;
 
-    //@Override
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException methodArgumentNotValidException,
@@ -93,15 +92,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         );
     }
 
-    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ExceptionHandler(DataBindingViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ResponseEntity<Object> handleDataIntegrityViolationException(
-            DataBindingViolationException dataIntegrityViolationException,
+            DataBindingViolationException dataBindingViolationException,
             WebRequest request) {
-        String errorMessage = dataIntegrityViolationException.getMostSpecificCause().getMessage();
-        log.error("Failed to save entity with integrity problems: " + errorMessage, dataIntegrityViolationException);
+        String errorMessage = dataBindingViolationException.getMostSpecificCause().getMessage();
+        log.error("Failed to save entity with integrity problems: " + errorMessage, dataBindingViolationException);
         return buildErrorResponse(
-                dataIntegrityViolationException,
+                dataBindingViolationException,
                 errorMessage,
                 HttpStatus.CONFLICT,
                 request);
