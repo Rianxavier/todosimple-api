@@ -1,6 +1,7 @@
 package com.rianxavier.todosimple.config;
 
 import com.rianxavier.todosimple.security.JWTAuthenticaticationFilter;
+import com.rianxavier.todosimple.security.JWTAuthorizationFilter;
 import com.rianxavier.todosimple.security.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -25,8 +26,6 @@ import java.util.Arrays;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
-
-    private AuthenticationManager authenticationManager;
 
     @Autowired
     private UserDetailsService userDetailsService;
@@ -70,6 +69,7 @@ public class SecurityConfig {
 
         // Adiciona o filtro de autenticação JWT
         http.addFilter(new JWTAuthenticaticationFilter(authenticationManager, this.jwtUtil));
+        http.addFilter(new JWTAuthorizationFilter(authenticationManager, this.jwtUtil, this.userDetailsService));
 
         // Retorna a instância do SecurityFilterChain
         return http.build();
