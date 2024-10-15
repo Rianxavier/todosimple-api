@@ -27,6 +27,8 @@ import java.util.Arrays;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
+    private AuthenticationManager authenticationManager;
+
     @Autowired
     private UserDetailsService userDetailsService;
 
@@ -44,37 +46,34 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
         // Desabilitar CORS e CSRF
         http.cors(cors -> cors.disable())
                 .csrf(csrf -> csrf.disable());
 
-        // Configurando o AuthenticationManager com o userDetailsService e passwordEncoder
+        // Configurando o AuthenticationManager
         AuthenticationManagerBuilder authenticationManagerBuilder = http
                 .getSharedObject(AuthenticationManagerBuilder.class);
         authenticationManagerBuilder.userDetailsService(this.userDetailsService)
                 .passwordEncoder(bCryptPasswordEncoder());
-
-        // Construindo o AuthenticationManager
-        AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
+        this.authenticationManager = authenticationManagerBuilder.build();
 
         // Configuração de autenticação e autorização
         http.authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers(HttpMethod.POST, PUBLIC_MATCHERS_POST).permitAll() // Permitir POST nas rotas públicas
-                        .requestMatchers(PUBLIC_MATCHERS).permitAll() // Permitir todas as rotas públicas
-                        .anyRequest().authenticated()) // Exigir autenticação para qualquer outra requisição
+                        .requestMatchers(HttpMethod.POST, PUBLIC_MATCHERS_POST).permitAll()
+                        .requestMatchers(PUBLIC_MATCHERS).permitAll()
+                        .anyRequest().authenticated() // Exigir autenticação para qualquer outra requisição
+                )
                 .authenticationManager(authenticationManager) // Adiciona o authenticationManager
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // Define a política de sessão como stateless
 
-        // Adiciona o filtro de autenticação JWT
+        // Adiciona os filtros de autenticação JWT
         http.addFilter(new JWTAuthenticaticationFilter(authenticationManager, this.jwtUtil));
         http.addFilter(new JWTAuthorizationFilter(authenticationManager, this.jwtUtil, this.userDetailsService));
 
         // Retorna a instância do SecurityFilterChain
         return http.build();
     }
-
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
