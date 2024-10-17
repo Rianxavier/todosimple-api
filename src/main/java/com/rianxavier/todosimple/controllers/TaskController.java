@@ -1,6 +1,7 @@
 package com.rianxavier.todosimple.controllers;
 
 import com.rianxavier.todosimple.models.Task;
+import com.rianxavier.todosimple.models.projection.TaskProjection;
 import com.rianxavier.todosimple.services.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +28,8 @@ public class TaskController {
     }
 
     @GetMapping("/user")
-    public ResponseEntity<List<Task>> findAllByUser() {
-        List<Task> objs = this.taskService.findAllByUser();
+    public ResponseEntity<List<TaskProjection>> findAllByUser() {
+        List<TaskProjection> objs = this.taskService.findAllByUser();
         return ResponseEntity.ok().body(objs);
     }
 

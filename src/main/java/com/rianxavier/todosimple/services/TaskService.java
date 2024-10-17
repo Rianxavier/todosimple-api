@@ -3,6 +3,7 @@ package com.rianxavier.todosimple.services;
 import com.rianxavier.todosimple.models.Task;
 import com.rianxavier.todosimple.models.User;
 import com.rianxavier.todosimple.models.enums.ProfileEnum;
+import com.rianxavier.todosimple.models.projection.TaskProjection;
 import com.rianxavier.todosimple.repositories.TaskRepository;
 import com.rianxavier.todosimple.security.UserSpringSecuriry;
 import com.rianxavier.todosimple.services.exceptions.AuthorizationException;
@@ -36,12 +37,12 @@ public class TaskService {
         return task;
     }
 
-    public List<Task> findAllByUser() {
+    public List<TaskProjection> findAllByUser() {
         UserSpringSecuriry userSpringSecuriry = UserService.authenticated();
         if (Objects.isNull(userSpringSecuriry))
             throw new AuthorizationException("Acesso negado!");
 
-        List<Task> tasks = this.taskRepository.findByUser_Id(userSpringSecuriry.getId());
+        List<TaskProjection> tasks = this.taskRepository.findByUser_Id(userSpringSecuriry.getId());
         return tasks;
     }
 
